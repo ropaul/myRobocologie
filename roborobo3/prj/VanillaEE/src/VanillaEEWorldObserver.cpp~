@@ -1,0 +1,29 @@
+/**
+ * @author Nicolas Bredeche <nicolas.bredeche@upmc.fr>
+ */
+
+
+#include "VanillaEE/include/VanillaEEWorldObserver.h"
+
+#include "World/World.h"
+
+
+VanillaEEWorldObserver::VanillaEEWorldObserver( World *__world ) : WorldObserver( __world )
+{
+	_world = __world;
+}
+
+VanillaEEWorldObserver::~VanillaEEWorldObserver()
+{
+	// nothing to do.
+}
+
+void VanillaEEWorldObserver::reset()
+{
+	// nothing to do.
+}
+
+void VanillaEEWorldObserver::step()
+{
+	// nothing to do.
+}

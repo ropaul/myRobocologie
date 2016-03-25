@@ -1,0 +1,131 @@
+/**
+ * @author Nicolas Bredeche <nicolas.bredeche@upmc.fr>
+ * @author yann teddy Ropaul<yannteddy.ropaul@gmail.com>
+ */
+
+
+#include "VanillaEE/include/VanillaEEController.h"
+#include "World/World.h"
+
+using namespace std;
+
+VanillaEEController::VanillaEEController( RobotWorldModel *__wm ) : Controller ( __wm ), myGenome(9 ), ticks(1), id(rand() %100)
+{
+	
+  // myGenome= new genome (_wm->_cameraSensorsNb + 1);  
+ 
+
+}
+
+VanillaEEController::~VanillaEEController()
+{
+	// nothing to do.
+}
+
+void VanillaEEController::reset()
+{
+  // setGenome( myGenome.mutate( _wm->_cameraSensorsNb, 0.5));
+}
+
+void VanillaEEController::step()
+{
+ 
+
+  //go forward (must change)
+  _wm->_desiredTranslationalValue =  + 1 - ( (double)gSensorRange - ((_wm->getCameraSensorValue(2,SENSOR_DISTANCEVALUE)+_wm->getCameraSensorValue(3,SENSOR_DISTANCEVALUE))/2) )  / (double)gSensorRange;
+
+  //enter is the vector of the value of the sensor 
+  double enter [ _wm->_cameraSensorsNb];
+  for( int i = 0 ; i < _wm->_cameraSensorsNb; i++){
+    enter[i] = (double)((32 - _wm->getCameraSensorValue(i,SENSOR_DISTANCEVALUE))/32.0);
+
+    
+  }
+
+double evaluation (myGenome.evaluate(enter)); // evaluate give a number between[-5,5] which will be the velocity
+  // cout <<"evaluation="<< evaluation<< endl;
+
+  if ( _wm-> _desiredRotationalVelocity+evaluation < -5){
+    _wm-> _desiredRotationalVelocity= -5;
+  }
+    else if ( _wm-> _desiredRotationalVelocity+evaluation > 5){
+      _wm-> _desiredRotationalVelocity =5;
+    }
+  else {
+    _wm->_desiredRotationalVelocity = evaluation;
+  }
+  
+  
+  // MUTATION TEST
+   ticks ++;
+
+  if(ticks% 100 == 0){
+    ticks = 0 ;
+    genome mutantGenome(myGenome.mutate( _wm->_cameraSensorsNb , 1));
+    cout<< "roborobo"<< myGenome.equals(mutantGenome)<< "   genome="<< myGenome.getSize()<< endl;
+   
+    setGenome( mutantGenome);
+    cout<<  myGenome.toString()<< endl;			      
+    }
+      
+  
+ 
+}
+
+
+genome VanillaEEController::getGenome()
+{
+  return myGenome;
+}
+
+void VanillaEEController::setGenome(genome  _genome)
+{
+  myGenome = _genome;
+}
+
+
+
+
+void VanillaEEController::broadcastGenome()
+{
+  // remarque \todo: limiting genome transmission is sensitive to sensor order. (but: assume ok)
+    
+  for( int i = 0 ; i < _wm->_cameraSensorsNb ; i++)
+    {
+      int targetIndex = _wm->getObjectIdFromCameraSensor(i);
+        
+      if ( targetIndex >= gRobotIndexStartOffset && targetIndex < gRobotIndexStartOffset+gNumberOfRobots )   // sensor ray bumped into a robot : communication is possible
+        {
+	  targetIndex = targetIndex - gRobotIndexStartOffset; // convert image registering index into robot id.
+            
+	  VanillaEEController* targetRobotController = dynamic_cast<VanillaEEController*>(gWorld->getRobot(targetIndex)->getController());
+            
+	  if ( ! targetRobotController )
+            {
+	      std::cerr << "Error from robot " << _wm->getId() << " : the observer of robot " << targetIndex << " is not compatible." << std::endl;
+	      exit(-1);
+            }
+	  else {
+
+targetRobotcontroller->fillPool(myGenome.mutate);
+}
+}
+}
+}
+
+
+
+void VanillaEEController:: fillPool (genome _genome){
+  genomePool.push_back(_genome);
+
+}
+
+  void VanillaEEController:: evolution() {
+
+  }
+
+  genome VanillaEEController::tournament(){
+
+    return getGenome();
+  }
+

@@ -1,0 +1,30 @@
+/**
+ * @author Nicolas Bredeche <nicolas.bredeche@upmc.fr>
+ */
+ 
+#ifndef VANILLAEEAGENTOBSERVER_H
+#define VANILLAEEAGENTOBSERVER_H 
+
+#include "RoboroboMain/common.h"
+#include "RoboroboMain/roborobo.h"
+#include "WorldModels/RobotWorldModel.h"
+#include "Observers/AgentObserver.h"
+#include "VanillaEE/include/genome.h"
+#include <iostream>
+
+
+class VanillaEEAgentObserver : public AgentObserver
+{
+	public:
+		VanillaEEAgentObserver( );
+		VanillaEEAgentObserver( RobotWorldModel *__wm );
+		~VanillaEEAgentObserver();
+				
+		void reset();
+		void step();
+		
+};
+
+
+#endif
+
