@@ -55,39 +55,43 @@ class VanillaEEController : public Controller
 		
 
 	private:
-		parameter param;
-		int ticks ;
-		int resources ;
-		int fitnessWindowSize;
+		parameter param;  // have all the param of the simulation
+		int ticks ;  // count the number of iteration
+		int resources ;  // the quantity of ressources , not use yet
+		int fitnessWindowSize; // good question
 		int wait ; // if any genome were capt , wait.
-		double xOld;
-		double yOld;
-		double xNew;
-		double yNew;
-		double distanceTraveled;
-		double vt;
-		double vr ;
+		double xOld;  // the old position in x-axes
+		double yOld;  // the old position in y-axes
+		double xNew; // the new postion
+		double yNew; // the new position
+		double distanceTraveled; // the distance traveled in ont tick
+		double vt; // the velocity translational
+		double vr ; // the velocity rotationnal
+
 		//double alpha ;
 		//double epsilon;
-		double fitness;
-		std::vector<double> fitnessWindow;
-		std::vector<double> poolSizeWindow;
+		double fitness;  // the fitness , may be replace by distanceTraveled
+
+		std::vector<double> fitnessWindow; // sliding window for the fitness
+		std::vector<double> poolSizeWindow; // sliding window for the match number
 		int poolSize;
-		std::vector<genome> genomePool ;
-		std::vector<double> fitnessPool;
-		genome myGenome;		
+		std::vector<genome> genomePool ;  // the genome receive by other agents
+		std::vector<double> fitnessPool;  // the fitness associate with the genome received.
+		double Smax;  // the senssor value the who see the farrer
+		genome myGenome;		// own genome
 		void broadcastGenome();
 		void updateFitness();
 		void updateFitnessDist();
 		void evaluation();
 
-		void fillFitness(int size);
+		void fillFitness(int size, double fitnessF);
 		void fillPoolSize(int size);
 		void evolution(int time);
 		genome tournament(int tournamentSize);
 		int inPool(genome _genome);
 		void resourcesManagement();
 		void cleanThePool();
+		void cleanTheWindow(); // clean the fitnessWindow
 		void updateDistance();
 		void updateDistanceV2();
 		genome fitnessProportional(int tournamentSize);

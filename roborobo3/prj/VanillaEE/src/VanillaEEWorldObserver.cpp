@@ -6,7 +6,7 @@
 
 
 #include "VanillaEE/include/VanillaEEWorldObserver.h"
-#include "VanillaEE/include/VanillaEEController.h"
+
 
 
 #include "World/World.h"
@@ -27,7 +27,7 @@
 
 using namespace  std;
 
-VanillaEEWorldObserver::VanillaEEWorldObserver( World *__world ) : WorldObserver( __world ) ,param()
+VanillaEEWorldObserver::VanillaEEWorldObserver( World *__world ) : WorldObserver( __world ) ,param(),turn(0),bestGenome(0)
 {
 	_world = __world;
 
@@ -87,6 +87,8 @@ VanillaEEWorldObserver::VanillaEEWorldObserver( World *__world ) : WorldObserver
 	}
 
 
+
+
 }
 
 VanillaEEWorldObserver::~VanillaEEWorldObserver()
@@ -101,31 +103,72 @@ void VanillaEEWorldObserver::reset()
 
 void VanillaEEWorldObserver::step()
 {
-	//	int lap (param.getSteptonextgeneration());
+	//		int lap (param.getSteptonextgeneration());
 	//
-	//	if ( gWorld->getIterations() % lap == 0  && lap!=0)
-	//	{
-	//		//if ( gVerbose && gDisplayMode == 0 )
-	//		//_world->resetWorld();
-	//		//saveLogs();
-	//		//saveAllLogs();
-	//		saveAllExperience();
-	//	}
+	//		if ( gWorld->getIterations() % lap == 0  && lap!=0)
+	//		{
+	//			//if ( gVerbose && gDisplayMode == 0 )
+	//			//_world->resetWorld();
+	//			//saveLogs();
+	//			//saveAllLogs();
+	//			saveAllExperience();
+	//		}
 	//
-	//	// the changement of experiement is the number of generation
-	//	if(gWorld->getIterations()!=0 && gWorld->getIterations() % (param.getSteptonextexperiment() * lap) ==0){
+	//		// the changement of experiement is the number of generation
+	//		if(gWorld->getIterations()!=0 && gWorld->getIterations() % (param.getSteptonextexperiment() * lap) ==0){
 	//
-	//		std::cout << name << endl;
+	//			std::cout << name << endl;
 	//
-	//		_world->resetWorld();
+	//			_world->resetWorld();
 	//
-	//		//updateExperiement();
+	//			//updateExperiement();
 	//
-	//	}
+	//		}
 
-	saveAllLogs();
-	saveLogs();
+	//	saveAllLogs();
+	//	saveLogs();
+		saveAllExperience();
+//	testDuPlusFort();
 
+	//registerTrace();
+
+
+}
+
+
+
+void VanillaEEWorldObserver::registerTrace(){
+
+	if ( gWorld->getIterations() ==20){
+
+		initTrajectoriesMonitor();
+		gTrajectoryMonitorMode = 0;
+
+
+	}
+
+	if (gWorld->getIterations() ==1020){
+		SDL_Delay(PAUSE_COMMAND); // 1000ms delay
+		saveTrajectoryImage();
+
+	}
+
+
+	int lap (param.getSteptonextgeneration());
+
+	if ( gWorld->getIterations()!=0 && gWorld->getIterations() % (param.getSteptonextexperiment() * lap  -1001 ) ==0){
+
+		initTrajectoriesMonitor();
+		gTrajectoryMonitorMode = 0;
+
+
+	}
+
+	if (gWorld->getIterations()!=0 && gWorld->getIterations() % (param.getSteptonextexperiment() * lap  -1 ) ==0){
+		SDL_Delay(PAUSE_COMMAND); // 200ms delay
+		saveTrajectoryImage();
+
+	}
 }
 
 
@@ -286,7 +329,7 @@ void VanillaEEWorldObserver::saveAllLogs() {
 
 			fichier1.close();  // on referme le fichier
 			fichier2.close();  // on referme le fichier
-			fichier3.close();
+			fichier3.close();  // celui la , non
 			fichier4.close();  // on referme le fichier
 
 
@@ -319,7 +362,8 @@ void VanillaEEWorldObserver::saveAllExperience(){
 
 	int lap (param.getSteptonextgeneration());
 
-	if ( gWorld->getIterations() / (param.getSteptonextexperiment() * lap) < param.getNbRun() ){
+	if ( turn < param.getNbRun() ){
+
 
 		// The following code shows an example where every 100 iterations, robots are re-located to their initial positions, and parameters are randomly changed.
 		//
@@ -331,7 +375,7 @@ void VanillaEEWorldObserver::saveAllExperience(){
 			//if ( gVerbose && gDisplayMode == 0 )
 			//_world->resetWorld();
 			std::cout << "Save  experiences\n";
-
+			cout <<gWorld->getIterations() / (param.getSteptonextexperiment() * lap) << endl;
 
 
 
@@ -454,7 +498,7 @@ void VanillaEEWorldObserver::saveAllExperience(){
 
 			if (gWorld->getIterations()!=0 && gWorld->getIterations() % (param.getSteptonextexperiment() * lap ) ==0){
 				cout << "NOW YOU SEE THIS" << endl;
-
+				turn ++;
 
 				ofstream fichier1("VanillaEE/fitness_" +name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
 				ofstream fichier2("VanillaEE/poolSize_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
@@ -740,10 +784,10 @@ double VanillaEEWorldObserver::variance (vector<double> array , double average){
 vector<double> VanillaEEWorldObserver::sort (vector<double> array){
 
 	vector<double> result (0);
-	for (int i = 0 ;  i < gWorld->getNbOfRobots() ; i++){
+	for (int i = 0 ;  i < (int) array.size() ; i++){
 		result.push_back( array[i]);
 	}
-	for (int i = gWorld->getNbOfRobots() ;  i >0  ; i--){
+	for (int i = (int) array.size() ;  i >0  ; i--){
 		for (int j = 0 ; j < i ; j++){
 			if (result[j] >result[j+1]){
 				double temp (result[j]);
@@ -758,14 +802,14 @@ vector<double> VanillaEEWorldObserver::sort (vector<double> array){
 // WARNING the enter array must be sort !! Give the first quartile
 double VanillaEEWorldObserver::firstQuartil (vector<double> array){
 
-	return array[int((1.0/4) *  gWorld->getNbOfRobots())];
+	return array[int((1.0/4) *  (int)array.size())];
 }
 
 
 // WARNING the enter array must be sort !! Give the second quartile
 double VanillaEEWorldObserver::secondQuartil (vector<double> array){
 
-	return array[int((1.0/2) *  gWorld->getNbOfRobots())];
+	return array[int((1.0/2) *  (int)array.size())];
 }
 
 
@@ -773,10 +817,12 @@ double VanillaEEWorldObserver::secondQuartil (vector<double> array){
 // WARNING the enter array must be sort !! Give the third quartile
 double VanillaEEWorldObserver::thirdQuartil (vector<double> array){
 
-	return array[int((3.0/4) *  gWorld->getNbOfRobots())];
+	return array[int((3.0/4) *  (int)array.size())];
 }
 
 
+
+//give the nomber of different genome it exist in the simulation.
 double VanillaEEWorldObserver::numberOfGenome(vector<genome>array){
 	vector<genome> temp (0);
 	for (int i = 0 ;i <(int) array.size() ; i ++){
@@ -788,3 +834,296 @@ double VanillaEEWorldObserver::numberOfGenome(vector<genome>array){
 	}
 	return temp.size();
 }
+
+
+
+
+
+
+void VanillaEEWorldObserver::testDuPlusFort(){
+
+	int lap (param.getSteptonextgeneration());
+
+	if ( turn < param.getNbRun() ){
+
+		if ( gWorld->getIterations() / lap *1.0 == 10.0  && lap!=0 && gWorld->getIterations() % lap == 0 )
+		{
+
+			vector<VanillaEEController*> arrayController(0);
+
+			for ( int i = 0 ; i != gWorld->getNbOfRobots() ; i++ )
+			{
+				VanillaEEController *controller = ((VanillaEEController*)(gWorld->getRobot(i)->getController()));
+
+
+				arrayController.push_back(controller);
+
+			}
+
+
+			vector<genome> arraysort = sortController(arrayController);
+
+			for (int i = 0 ; i < 100 ; i ++){
+				bestGenome.push_back(arraysort[(int)arraysort.size() -i -1]);
+			}
+
+
+		}
+
+
+
+
+		if ( gWorld->getIterations() / lap >= 10  && gWorld->getIterations() % lap == 0  && lap!=0 && gWorld->getIterations()!=0)
+		{
+
+
+
+
+
+			if ( gWorld->getIterations() % lap == 0  && gWorld->getIterations()!=0)
+			{
+				//if ( gVerbose && gDisplayMode == 0 )
+				//_world->resetWorld();
+				std::cout << "Save  experiences\n";
+
+
+
+
+
+
+				int isalive(0);
+				int nbgenome(0);
+
+				vector<double> fitnessArray (0);
+				vector<double> matchArray(0);
+				vector < genome> genArray(0);
+				vector <double>  distArray(0);
+
+
+				vector <double>generation(0);
+
+
+				for ( int i = 0 ; i != gWorld->getNbOfRobots() ; i++ )
+				{
+					//Robot *robot = (gWorld->getRobot(i));
+					VanillaEEController *controller = ((VanillaEEController*)(gWorld->getRobot(i)->getController()));
+
+					if (isIn(bestGenome, controller->getGenome())){
+
+						fitnessArray.push_back(controller->getFitness());
+						matchArray.push_back(controller->getPoolSize());
+						genArray.push_back(controller->getGenome());
+						distArray.push_back(controller->getDistance());
+
+						if(controller->isAlive()) isalive +=1 ;
+
+						generation.push_back(controller->getGenome().getGeneration());
+
+
+					}
+
+				}
+
+				double secondQFitness (0);
+
+				double secondQMatch (0);
+
+				double secondQGen (0);
+
+				double secondQDist (0);
+
+				vector<double> fitnessSort (0);
+
+				vector<double> matchSort (0);
+
+				if ((int) fitnessArray.size() >0){
+
+
+					vector<double> fitnessSort =sort(fitnessArray);
+
+					secondQFitness =secondQuartil(fitnessSort);
+
+
+
+					vector<double> matchSort =sort(matchArray);
+
+					secondQMatch =secondQuartil(matchSort);
+
+
+
+					vector<double> genSort (sort(generation));
+
+					secondQGen =secondQuartil(genSort);
+
+
+
+
+					vector<double> distSort (sort(distArray));
+
+					secondQDist =secondQuartil(distSort);
+
+
+
+					nbgenome = numberOfGenome(genArray);
+
+
+
+
+
+
+
+				}
+
+				name = "logs_" + param.toString()+".csv";
+
+				ofstream fichier1("VanillaEE/fitness_" +name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+				ofstream fichier2("VanillaEE/poolSize_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+				ofstream fichier3("VanillaEE/genomeAge_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+				ofstream fichier4("VanillaEE/distance_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+				ofstream fichier5("VanillaEE/inactive_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+				ofstream fichier6("VanillaEE/nbgenome_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+				ofstream fichier7("VanillaEE/fitnessmax_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+				ofstream fichier8("VanillaEE/poolSizemax_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+
+
+
+				if(fichier1 && fichier2 && fichier3 && fichier4 && fichier5)  // si l'ouverture a réussi
+
+				{
+
+					fichier1  << secondQFitness<<"," ;
+					fichier2 << secondQMatch<<",";
+					fichier3 << secondQGen<<"," ;
+					fichier4 << secondQDist<<",";
+					fichier5 << isalive<<",";
+					fichier6 << nbgenome<<",";
+
+
+
+					if (fitnessSort.size()>0){
+						fichier7 << fitnessSort[max((int)(fitnessSort.size() - 1),0)]<<",";
+						fichier8 << matchSort[max((int)(matchSort.size() - 1),0)]<<",";
+					}
+
+					if (fitnessSort.size()==0){
+											fichier7 << 0<<",";
+											fichier8 << 0<<",";
+										}
+
+
+					fichier1.close();  // on referme le fichier
+					fichier2.close();  // on referme le fichier
+					fichier4.close();  // on referme le fichier
+					fichier5.close();  // on referme le fichier
+					fichier6.close();  // on referme le fichier
+					fichier7.close();  // on referme le fichier
+					fichier8.close();  // on referme le fichier
+
+				}
+
+				else{  // sinon
+
+					cerr << "Erreur à l'ouverture !" << endl;
+
+				}
+
+				if (gWorld->getIterations()!=0 && gWorld->getIterations() % (param.getSteptonextexperiment() * lap ) ==0){
+
+					turn ++;
+
+					ofstream fichier1("VanillaEE/fitness_" +name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+					ofstream fichier2("VanillaEE/poolSize_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+					ofstream fichier3("VanillaEE/genomeAge_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+					ofstream fichier4("VanillaEE/distance_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+					ofstream fichier5("VanillaEE/inactive_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+					ofstream fichier6("VanillaEE/nbgenome_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+					ofstream fichier7("VanillaEE/fitnessmax_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+					ofstream fichier8("VanillaEE/poolSizemax_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+
+
+
+
+					if(fichier1 && fichier2 && fichier3 &&fichier4 && fichier5 && fichier6 && fichier7)  // si l'ouverture a réussi
+
+					{
+
+
+
+						fichier1  <<endl;
+						fichier2  <<endl;
+						fichier3  <<endl;
+						fichier4  <<endl;
+						fichier5  <<endl;
+						fichier6  <<endl;
+						fichier7  <<endl;
+						fichier8  <<endl;
+
+						fichier1.close();  // on referme le fichier
+						fichier2.close();  // on referme le fichier
+						fichier4.close();  // on referme le fichier
+						fichier5.close();  // on referme le fichier
+						fichier6.close();  // on referme le fichier
+						fichier7.close();  // on referme le fichier
+						fichier8.close();  // on referme le fichier
+
+					}
+
+					else{  // sinon
+
+						cerr << "Erreur à l'ouverture !" << endl;
+
+					}
+
+
+					//_world->resetWorld();
+
+				}
+				if(gWorld->getIterations()!=0 && gWorld->getIterations() % (param.getSteptonextexperiment() * lap) ==0){
+
+
+					_world->resetWorld();
+
+					//updateExperiement();
+
+				}
+
+			}
+
+		}
+	}
+}
+
+vector<genome> VanillaEEWorldObserver::sortController(vector<VanillaEEController*> array){
+	vector<genome> result (0);
+
+	int j (0);
+	for  (int i =0 ; i < (int)array.size(); i++ ){
+		double max (0);
+		int maxController (0);
+		for  ( j =i ; j < (int)array.size(); j++ ){
+			if (array[j]->getFitness() > max){
+				max = array[i]->getFitness();
+				maxController = j;
+			}
+		}
+		result.push_back(array[maxController]->getGenome());
+		array.erase(array.begin() +maxController);
+	}
+
+	return result;
+
+}
+
+
+bool VanillaEEWorldObserver::isIn(vector<genome> array, genome candidat){
+
+
+	for (int i =0 ; i < (int)array.size(); i++){
+
+		if (array[i].equals(candidat)) return true;
+	}
+
+	return false;
+
+}
+

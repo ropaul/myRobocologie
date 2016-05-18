@@ -24,4 +24,10 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<variableList>
+		<variable>
+			<name>includeRoborobo</name>
+			<value>file:/home/ropaul/Documents/roborobo/Stage_androide_2016/roborobo3/include</value>
+		</variable>
+	</variableList>
 </projectDescription>

@@ -33,8 +33,8 @@
 #define MAXRESOURCESVALUE 0
 #define MAXMUTATIONALPHA  0
 #define MAXMUTATIONEPSILON  0
-#define MAXMUTATIONSIGMA 0
-#define MAXTOURNAMENTSIZE 15
+#define MAXMUTATIONSIGMA 0.001
+#define MAXTOURNAMENTSIZE 2
 #define MAXDEATHLENGTH 0
 #define MAXCHOICETOURNOI 2
 
@@ -44,8 +44,8 @@
 #define STEPRESOURCESVALUE 0
 #define STEPMUTATIONALPHA 0
 #define STEPMUTATIONEPSILON 0
-#define STEPMUTATIONSIGMA 0
-#define STEPTOURNAMENTSIZE 1
+#define STEPMUTATIONSIGMA 0.005
+#define STEPTOURNAMENTSIZE 0
 #define STEPDEATHLENGTH  0
 #define STEPCHOICETOURNOI 0
 
@@ -56,7 +56,7 @@
 #define EVALUATEMUTATIONALPHA false
 #define EVALUATEMUTATIONEPSILON false
 #define EVALUATEMUTATIONSIGMA false
-#define EVALUATETOURNAMENTSIZE true
+#define EVALUATETOURNAMENTSIZE false
 #define EVALUATEDEATHLENGTH false
 #define EVALUATECHOICETOURNOI false
 
@@ -66,7 +66,7 @@
 #define STEPTONEXTEXPERIMENT 100
 #define REACTIVATIONVALUE  1  // if 1, reactivate only if other genome from other agent, 2 reactivate with new genome , 3 never reactivate
 #define FITNESSTYPE 2 // if 2 the fitness is the distance traveled , if 1 fitness is the number of reward
-#define NBRUN  80
+#define NBRUN  10
 
 
 

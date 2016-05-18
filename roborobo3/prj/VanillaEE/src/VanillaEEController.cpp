@@ -6,6 +6,7 @@
 
 #include "VanillaEE/include/VanillaEEController.h"
 #include "World/World.h"
+#include "RoboroboMain/roborobo.h"
 
 #include <limits.h>
 
@@ -21,7 +22,7 @@ using namespace std;
 // the reward give as resources
 
 VanillaEEController::VanillaEEController( RobotWorldModel *__wm ) : Controller ( __wm ),param(), ticks(1),resources(param.getResourcesatbegining()),
-		fitnessWindowSize(1),wait(0)/*,alpha(5),epsilon(0.5)*/,fitness(0),poolSize(0) ,genomePool(0), myGenome(_wm->_cameraSensorsNb *3*2 +2,_wm->getId(), 1 )
+		fitnessWindowSize(1),wait(0)/*,alpha(5),epsilon(0.5)*/,fitness(0),poolSize(0) ,genomePool(0),Smax (0), myGenome(_wm->_cameraSensorsNb *3*2 +2,_wm->getId(), 1 )
 {
 	poolSize= 0;
 	xOld = __wm->getXReal();
@@ -41,7 +42,7 @@ VanillaEEController::~VanillaEEController()
 void VanillaEEController::reset()
 {
 
-	for (int i = 0 ; i < (int)fitnessWindow.size(); i++){
+	for (int i = (int)fitnessWindow.size() ; i >0 ; i--){
 		fitnessWindow.pop_back();
 		poolSizeWindow.pop_back();
 
@@ -55,7 +56,17 @@ void VanillaEEController::reset()
 	fitness=0;
 	poolSize=0;
 
+	Smax =0;
+
+	poolSize= 0;
+		xOld = _wm->getXReal();
+		yOld = _wm->getYReal();
+		xNew = _wm->getXReal();
+		yNew = _wm->getYReal();
+		updateDistance();
+
 	setGenome(*(new genome(_wm->_cameraSensorsNb *3*2+2, _wm->getId(),1 )));
+
 
 
 }
@@ -75,7 +86,7 @@ void VanillaEEController::step()
 
 		switch(param.getFitnessType()){
 		case 1 :
-			updateFitness();
+			//updateFitness();
 			updateDistanceV2();
 			break;
 		case 2:
@@ -119,7 +130,7 @@ void VanillaEEController::setGenome(genome  _genome)
 void VanillaEEController:: evaluation() {
 
 
-
+	Smax = SENSOR_DISTANCEVALUE;
 	double enter [ _wm->_cameraSensorsNb *3]; // array who detect robot, reward and other
 
 
@@ -140,6 +151,7 @@ void VanillaEEController:: evaluation() {
 		else{ // other
 			enter[i+  2* _wm->_cameraSensorsNb ] = (double)(( (double)gSensorRange - _wm->getCameraSensorValue(i,SENSOR_DISTANCEVALUE))/ (double)gSensorRange);
 		}
+		Smax = min (Smax ,(double)(gSensorRange - _wm->getCameraSensorValue(i,SENSOR_DISTANCEVALUE))/ (double)gSensorRange );
 	}
 
 	/*
@@ -184,6 +196,7 @@ void VanillaEEController:: evaluation() {
 		cout << "ERROR!!!!!"<< endl;
 		for (int i = 0 ; i < _wm->_cameraSensorsNb *3; i++) {
 			cout << enter[i] << "|" ;
+
 		}
 		cout << endl;
 		cout << myGenome.toString();
@@ -217,24 +230,22 @@ void VanillaEEController:: evolution(int time) {
 
 
 		// At the beginning, we let the fitness be evaluate long enough to be significant
-		if (fitnessWindowSize < param.getFitneswindowsize()) {
-			cout << "FILL THE FITNESS " << _wm->getId() << endl;
-			fitnessWindowSize ++;
-			fillPoolSize(param.getFitneswindowsize());
-			fillFitness( param.getFitneswindowsize());
+		if ( param.getFitneswindowsize() > ticks/ time) {
+			//cout << "FILL THE FITNESS " << _wm->getId() << endl;
+			//fitnessWindowSize ++;
+			fillPoolSize(2);///////////////////////////////////////////////////////////////////////////////////////////////////////////////fillPoolSize(param.getFitneswindowsize());
+			//fillFitness( param.getFitneswindowsize());
 			fitness =0;
 			cleanThePool();
-			if(fitnessWindowSize == param.getFitneswindowsize()){
-				cout << "end of the beginning evaluation of the fitness"<< endl ;
-			}
+
 		}
 
 		else {
 
 			// MUTATION TIME
-			cout << "END OF GENERATION FOR THE AGENT " << _wm->getId() << endl;
-			fillPoolSize( param.getFitneswindowsize()); // update the variable pool size
-			fillFitness( param.getFitneswindowsize());// update his own fitness
+			//cout << "END OF GENERATION FOR THE AGENT " << _wm->getId() << endl;
+			fillPoolSize(2); // update the variable pool size ///////////////////////////////////////////////////////////////////////////////////////////////////////////////fillPoolSize(param.getFitneswindowsize());
+			fillFitness( param.getFitneswindowsize(), fitness);// update his own fitness
 
 
 			//choice of the tournament style
@@ -368,7 +379,7 @@ void VanillaEEController::broadcastGenome()
 			}
 			else {
 
-				targetRobotController->fillPool(myGenome,fitness);
+				targetRobotController->fillPool(getGenome(),getFitness());
 			}
 		}
 	}
@@ -449,7 +460,7 @@ genome VanillaEEController::fitnessProportional(int tournamentSize){
 	if (tournamentSize > poolSize){
 		tempSize = poolSize;
 	}
-	int tournamentSize2 (tempSize); // save the size for later
+	//int tournamentSize2 (tempSize); // save the size for later
 	while (tempSize > 0){ // take randomly tempSize genomes to tournament
 		int randValue ( (int) rand() % poolSize);
 		tournament.push_back(genomePool[randValue]);
@@ -472,7 +483,7 @@ genome VanillaEEController::fitnessProportional(int tournamentSize){
 		max =0;
 		indexMax=0;
 		// choose the best genome between those we peek randomly
-		for (int j =0 ; j < fitnesstournament.size(); j++){
+		for (int j =0 ; j < (int) fitnesstournament.size(); j++){
 			if (max < fitnesstournament[j]){
 				indexMax = j;
 				max = fitnesstournament[j];
@@ -530,6 +541,16 @@ void VanillaEEController:: cleanThePool(){
 
 }
 
+
+void VanillaEEController:: cleanTheWindow(){
+	//erase all the genome for the next génération
+	while ((int) fitnessWindow.size() > 0){
+		fitnessWindow.pop_back();
+	}
+fitnessWindowSize = 0;
+}
+
+
 double VanillaEEController::getPoolSize()const{
 	double result (0);
 	int fsize(poolSizeWindow.size());
@@ -544,7 +565,7 @@ double VanillaEEController::getPoolSize()const{
 
 //to fill the poolSizeWindow
 void VanillaEEController::fillPoolSize(int size){
-	while (fitnessWindowSize > size ) {
+	while ((int)poolSizeWindow.size() > size ) {
 		poolSizeWindow.erase(poolSizeWindow.begin());
 	}
 	poolSizeWindow.push_back(poolSize);
@@ -586,12 +607,12 @@ void VanillaEEController::updateFitnessDist(){
 }
 
 //to fill the fitnessWindow 
-void VanillaEEController::fillFitness(int size){
+void VanillaEEController::fillFitness(int size, double fitnessF){
 	while (fitnessWindowSize > size ) {
 		fitnessWindow.erase(fitnessWindow.begin());
-		fitnessWindowSize -- ;
+		//fitnessWindowSize -- ;
 	}
-	fitnessWindow.push_back(fitness);
+	fitnessWindow.push_back(fitnessF);
 }
 
 
@@ -639,9 +660,12 @@ void VanillaEEController::updateDistance(){
 
 void VanillaEEController::updateDistanceV2(){
 
-	distanceTraveled += (vt * ( 1- vr) * (1 - _wm->_cameraSensorsNb))  ;
-
-
+	double newvt ((vt)/myGenome.getSize()); // normalize the translation vélocity
+	double newvr (( vr)/myGenome.getSize()); // normalize the rotation vélocity
+	double result ((abs(newvt) * ( 1- abs(newvr)) * (Smax))) ;
+	distanceTraveled += result  ;
+	fitness = result;
+	fillFitness(fitnessWindowSize,result);
 
 
 }
