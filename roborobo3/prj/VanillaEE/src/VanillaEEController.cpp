@@ -41,9 +41,10 @@ VanillaEEController::~VanillaEEController()
 
 void VanillaEEController::reset()
 {
+	cleanTheWindow();
+	cleanTheWindowV2();
+	for (int i = (int)poolSizeWindow.size() ; i >0 ; i--){
 
-	for (int i = (int)fitnessWindow.size() ; i >0 ; i--){
-		fitnessWindow.pop_back();
 		poolSizeWindow.pop_back();
 
 	}
@@ -59,11 +60,11 @@ void VanillaEEController::reset()
 	Smax =0;
 
 	poolSize= 0;
-		xOld = _wm->getXReal();
-		yOld = _wm->getYReal();
-		xNew = _wm->getXReal();
-		yNew = _wm->getYReal();
-		updateDistance();
+	xOld = _wm->getXReal();
+	yOld = _wm->getYReal();
+	xNew = _wm->getXReal();
+	yNew = _wm->getYReal();
+	updateDistance();
 
 	setGenome(*(new genome(_wm->_cameraSensorsNb *3*2+2, _wm->getId(),1 )));
 
@@ -130,7 +131,7 @@ void VanillaEEController::setGenome(genome  _genome)
 void VanillaEEController:: evaluation() {
 
 
-	Smax = SENSOR_DISTANCEVALUE;
+	Smax = gSensorRange;
 	double enter [ _wm->_cameraSensorsNb *3]; // array who detect robot, reward and other
 
 
@@ -151,7 +152,7 @@ void VanillaEEController:: evaluation() {
 		else{ // other
 			enter[i+  2* _wm->_cameraSensorsNb ] = (double)(( (double)gSensorRange - _wm->getCameraSensorValue(i,SENSOR_DISTANCEVALUE))/ (double)gSensorRange);
 		}
-		Smax = min (Smax ,(double)(gSensorRange - _wm->getCameraSensorValue(i,SENSOR_DISTANCEVALUE))/ (double)gSensorRange );
+		Smax = min (Smax ,(double)( _wm->getCameraSensorValue(i,SENSOR_DISTANCEVALUE))/ (double)gSensorRange );
 	}
 
 	/*
@@ -224,28 +225,30 @@ void VanillaEEController:: evolution(int time) {
 
 	if(ticks% time == 0){
 		updateDistanceV2(); // update the traveled distance
+
 		//cout << "END OF GENERATION FOR THE AGENT " << _wm->getId() << endl;
 		//ticks = 0 ;
 		//cout << "pool size= "<< poolSize<< endl;
 
 
 		// At the beginning, we let the fitness be evaluate long enough to be significant
-		if ( param.getFitneswindowsize() > ticks/ time) {
+		if ( 1 > ticks/ time) {//		if ( param.getFitneswindowsize() > ticks/ time) {
 			//cout << "FILL THE FITNESS " << _wm->getId() << endl;
 			//fitnessWindowSize ++;
-			fillPoolSize(2);///////////////////////////////////////////////////////////////////////////////////////////////////////////////fillPoolSize(param.getFitneswindowsize());
-			//fillFitness( param.getFitneswindowsize());
-			fitness =0;
+			fillPoolSize(param.getFitneswindowsize());///////////////////////////////////////////////////////////////////////////////////////////////////////////////fillPoolSize(param.getFitneswindowsize());
+			fillFitnessV2( param.getFitneswindowsize(),fitness);
+//			fitness =0;
 			cleanThePool();
+			cleanTheWindow();
 
 		}
 
 		else {
-
+			fillFitnessV2( param.getFitneswindowsize(),fitness);
 			// MUTATION TIME
 			//cout << "END OF GENERATION FOR THE AGENT " << _wm->getId() << endl;
-			fillPoolSize(2); // update the variable pool size ///////////////////////////////////////////////////////////////////////////////////////////////////////////////fillPoolSize(param.getFitneswindowsize());
-			fillFitness( param.getFitneswindowsize(), fitness);// update his own fitness
+			fillPoolSize(param.getFitneswindowsize()); // update the variable pool size ///////////////////////////////////////////////////////////////////////////////////////////////////////////////fillPoolSize(param.getFitneswindowsize());
+			//fillFitness( param.getFitneswindowsize(), fitness);// update his own fitness
 
 
 			//choice of the tournament style
@@ -269,6 +272,7 @@ void VanillaEEController:: evolution(int time) {
 				wait = DEATHLENGTH ;
 				resources = 0;
 				fitness = 0;
+				cleanTheWindow();
 				resourcesManagement(); // stop the agent
 				return;
 			}
@@ -284,11 +288,11 @@ void VanillaEEController:: evolution(int time) {
 			}
 
 
-		}
-		if (wait != 0){
-			wait --; // the wait will end in two generation
-			if (wait == 0){
 
+			else{//		if (wait != 0){
+				//			wait --; // the wait will end in two generation
+				//			if (wait == 0){
+				wait = 0;
 				switch(param.getReactivationValue()){
 				case 1:
 					reactivation1();
@@ -305,14 +309,16 @@ void VanillaEEController:: evolution(int time) {
 				}
 				resources = RESOURCESATBEGINNING ;
 			}
-
 		}
-		else {
-			resources = param.getResourcesatbegining() ;
-		}
+		//		else {
+		//			resources = param.getResourcesatbegining() ;
+		//		}
 		fitness =0 ; // new generation , new fitness (even if dead)
 		distanceTraveled = 0;
+		cleanTheWindow();
+		//	}
 	}
+
 }
 
 
@@ -339,6 +345,7 @@ void VanillaEEController::reactivation1(){
 			setGenome( child.mutate(param.getMutationalpha(), param.getMutationepsilon()));
 		}
 		cleanThePool(); // clean the differents pool
+		cleanTheWindow();
 	}
 
 }
@@ -379,7 +386,7 @@ void VanillaEEController::broadcastGenome()
 			}
 			else {
 
-				targetRobotController->fillPool(getGenome(),getFitness());
+				targetRobotController->fillPool(getGenome(),fitness);
 			}
 		}
 	}
@@ -547,8 +554,19 @@ void VanillaEEController:: cleanTheWindow(){
 	while ((int) fitnessWindow.size() > 0){
 		fitnessWindow.pop_back();
 	}
-fitnessWindowSize = 0;
+	fitnessWindowSize = 0;
 }
+
+
+
+void VanillaEEController:: cleanTheWindowV2(){
+	//erase all the genome for the next génération
+	while ((int) fitnessWindowV2.size() > 0){
+		fitnessWindowV2.pop_back();
+	}
+
+}
+
 
 
 double VanillaEEController::getPoolSize()const{
@@ -583,6 +601,19 @@ double VanillaEEController:: getFitness(){
 	return (double) ( result / fsize);
 }
 
+
+
+double VanillaEEController:: getFitnessV2(){
+	double result (0);
+	int fsize(fitnessWindowV2.size());
+	if (fsize == 0) return 0;
+	for (int i =0 ; i < fsize ; i ++ ) {
+		result += fitnessWindowV2[i];
+	}
+
+	return (double) ( result / fsize);
+}
+
 // when meet an other robot which is already meet, we must update the fitness of this robots in the fitnessPool
 void VanillaEEController::updateFitness(){
 
@@ -600,9 +631,7 @@ void VanillaEEController::updateFitness(){
 void VanillaEEController::updateFitnessDist(){
 
 	updateDistanceV2()	;
-	fitness = getDistance();
-
-
+	//fitness = getDistance();
 
 }
 
@@ -615,7 +644,14 @@ void VanillaEEController::fillFitness(int size, double fitnessF){
 	fitnessWindow.push_back(fitnessF);
 }
 
-
+//to fill the fitnessWindow
+void VanillaEEController::fillFitnessV2(int size, double fitnessF){
+	while (fitnessWindowSize > size ) {
+		fitnessWindowV2.erase(fitnessWindow.begin());
+		//fitnessWindowSize -- ;
+	}
+	fitnessWindowV2.push_back(fitnessF);
+}
 
 
 // manage the resources
@@ -662,9 +698,10 @@ void VanillaEEController::updateDistanceV2(){
 
 	double newvt ((vt)/myGenome.getSize()); // normalize the translation vélocity
 	double newvr (( vr)/myGenome.getSize()); // normalize the rotation vélocity
-	double result ((abs(newvt) * ( 1- abs(newvr)) * (Smax))) ;
+	double result ((abs(newvt) * ( 1- abs(newvr)) * (1-Smax))*10000) ;
+
 	distanceTraveled += result  ;
-	fitness = result;
+	fitness = getFitness();
 	fillFitness(fitnessWindowSize,result);
 
 

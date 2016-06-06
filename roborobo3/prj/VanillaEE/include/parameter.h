@@ -17,14 +17,14 @@
 #include <map>
 
 #define MINSTEPTONEXTGENERATION 1000
-#define MINFITNESSWINDOWSIZE 10
+#define MINFITNESSWINDOWSIZE 100
 #define MINRESOURCESATBEGINNING 900
 #define MINRESOURCESVALUE 100
 #define MINMUTATIONALPHA 5
 #define MINMUTATIONEPSILON 0.2
 #define MINMUTATIONSIGMA 0.0001
-#define MINTOURNAMENTSIZE 5
-#define MINDEATHLENGTH 2  // do not touch this , never																																								never
+#define MINTOURNAMENTSIZE 10
+#define MINDEATHLENGTH 1  // do not touch this , never																																								never
 #define MINCHOICETOURNOI 1 // IF 1 IT IS A SIMPLE TOURNOI , 2 IT IS FITNESS PROPORTIONNAL TOURNOI
 
 #define MAXSTEPTONEXTGENERATION 0
@@ -63,10 +63,10 @@
 
 
 #define GAUSIENNE true
-#define STEPTONEXTEXPERIMENT 100
+#define STEPTONEXTEXPERIMENT 20
 #define REACTIVATIONVALUE  1  // if 1, reactivate only if other genome from other agent, 2 reactivate with new genome , 3 never reactivate
 #define FITNESSTYPE 2 // if 2 the fitness is the distance traveled , if 1 fitness is the number of reward
-#define NBRUN  10
+#define NBRUN  2
 
 
 

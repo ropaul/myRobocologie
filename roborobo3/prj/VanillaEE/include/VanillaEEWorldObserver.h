@@ -28,7 +28,15 @@ class VanillaEEWorldObserver : public WorldObserver
 			parameter param;
 			std::string name;
 			int turn ;
+			int nbBataille;
+			int indexBatailleB;
+			int indexBatailleS;
 			std::vector<genome> bestGenome;
+			int bestFitness;
+			genome BestGenome;
+			genome SurvivorGenome;
+			std::vector<genome> BestGenomeArray;
+			std::vector<genome> SurvivorGenomeArray;
 			double average(std::vector<double> array);
 			double variance (std::vector<double> array , double average);
 			std::vector<double> sort (std::vector<double> array);
@@ -38,13 +46,18 @@ class VanillaEEWorldObserver : public WorldObserver
 			double numberOfGenome (std:: vector<genome>array);
 			void saveLogs();
 			void saveAllLogs();
+			void save();
 			void saveAllExperience();
 			void updateExperiement();
 			void testDuPlusFort();
+
 			std::vector<genome> sortController(std::vector<VanillaEEController*> array);
 			bool isIn(std::vector<genome> array, genome candidat);
 			void registerTrace();
 			void FightBetweenTheStrongAndTheSurvivor();
+			void FightBetweenTheStrongAndTheSurvivorCombinatoire(int nbCouple);
+			void FightBetweenTheFirstAndTheSurvivorCombinatoire(int nbCouple);
+			void calculIndexBataille(int nbCouple);
 
 		
 	public:

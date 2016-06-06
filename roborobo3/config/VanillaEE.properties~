@@ -10,7 +10,7 @@
 # Main simulation parameters
 #
 
-gInitialNumberOfRobots = 50
+gInitialNumberOfRobots = 5
 
 gNbOfLandmarks = 0
 gNbOfPhysicalObjects = 0
@@ -20,7 +20,7 @@ gMaxIt = 8000000
 gSensorRange = 32
 gSynchronization = true # not implemented
 
-gDisplayMode = 2
+gDisplayMode = 0
 gBatchMode = false
 
 gRandomSeed = -1

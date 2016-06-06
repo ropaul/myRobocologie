@@ -242,9 +242,7 @@ bool parameter::increaseChoiceTournoi() {
 std::string parameter::toString(){
 	std::string s ( "");
 	ostringstream strs;
-	    strs <<  steptonextgeneration <<"_"<< fitneswindowsize <<"_"<< resourcesatbegining <<"_"<< resourcesvalues <<"_"<< mutationalpha <<"_"
-	    		<< mutationepsilon <<"_"<< mutationsigma <<"_"<< tournamentsize <<"_"
-	    << deathlength <<"_"<< gausienne <<"_"<< steptonextexperiment;
+	    strs <<  steptonextgeneration <<"_"<< mutationsigma <<"_"<< tournamentsize <<"_"<< steptonextexperiment;
 	    s += strs.str();
 	    return s;
 }

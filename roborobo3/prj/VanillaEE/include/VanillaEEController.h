@@ -48,6 +48,7 @@ class VanillaEEController : public Controller
        		void monitorSensory();
 		void fillPool(genome _genome, double _fitness);
 		double getFitness();
+		double getFitnessV2();
 		double getPoolSize()const ;
 		bool isAlive() ;
 		double getDistance();
@@ -73,6 +74,7 @@ class VanillaEEController : public Controller
 		double fitness;  // the fitness , may be replace by distanceTraveled
 
 		std::vector<double> fitnessWindow; // sliding window for the fitness
+		std::vector<double> fitnessWindowV2; // sliding window for the fitness
 		std::vector<double> poolSizeWindow; // sliding window for the match number
 		int poolSize;
 		std::vector<genome> genomePool ;  // the genome receive by other agents
@@ -85,6 +87,7 @@ class VanillaEEController : public Controller
 		void evaluation();
 
 		void fillFitness(int size, double fitnessF);
+		void fillFitnessV2(int size, double fitnessF);
 		void fillPoolSize(int size);
 		void evolution(int time);
 		genome tournament(int tournamentSize);
@@ -92,6 +95,7 @@ class VanillaEEController : public Controller
 		void resourcesManagement();
 		void cleanThePool();
 		void cleanTheWindow(); // clean the fitnessWindow
+		void cleanTheWindowV2(); // clean the fitnessWindow
 		void updateDistance();
 		void updateDistanceV2();
 		genome fitnessProportional(int tournamentSize);
