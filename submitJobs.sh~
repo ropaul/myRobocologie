@@ -1,7 +1,7 @@
 #!/bin/bash
 
 jobName=$1
-nb_runs=$1;
+nb_runs=$2;
 
 if [ ! $# == 2 ]; then
   echo "  Usage: $0 jobname.script nb_of_replications"
