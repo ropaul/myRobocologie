@@ -1406,7 +1406,7 @@ void VanillaEEWorldObserver::FightBetweenTheStrongAndTheSurvivorCombinatoire(int
 // like  FightBetweenTheStrongAndTheSurvivor but with 10 best and ten survivor and then make combinatory fight
 void VanillaEEWorldObserver::FightBetweenTheFirstAndTheSurvivorCombinatoire(int nbCouple){
 	int lap (param.getSteptonextgeneration());
-	if ( nbBataille < nbCouple ){
+	if ( ((indexBatailleS < nbCouple ) && (indexBatailleB < nbCouple )) ){
 
 
 		if (    lap!=0 && gWorld->getIterations() % lap == 0 )
@@ -1505,7 +1505,7 @@ void VanillaEEWorldObserver::FightBetweenTheFirstAndTheSurvivorCombinatoire(int 
 
 			}
 
-			if (turn == param.getNbRun() && ((indexBatailleS < nbCouple ) || (indexBatailleB < nbCouple ))){
+			if (turn == param.getNbRun() && ((indexBatailleS < nbCouple ) && (indexBatailleB < nbCouple ))){
 				turn =0;
 
 
