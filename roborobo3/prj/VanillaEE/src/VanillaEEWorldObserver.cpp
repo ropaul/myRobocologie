@@ -109,11 +109,11 @@ void VanillaEEWorldObserver::step()
 
 	//	saveAllLogs();
 	//	saveLogs();
-	//	saveAllExperience();
+//		saveAllExperience();
 	//	testDuPlusFort();
 	//	FightBetweenTheStrongAndTheSurvivor();
-	//	FightBetweenTheStrongAndTheSurvivorCombinatoire(5);
-	FightBetweenTheFirstAndTheSurvivorCombinatoire(5);
+		FightBetweenTheStrongAndTheSurvivorCombinatoire(10);
+//	FightBetweenTheFirstAndTheSurvivorCombinatoire(5);
 	//registerTrace();
 
 
@@ -543,7 +543,7 @@ void VanillaEEWorldObserver::saveAllExperience(){
 				//_world->resetWorld();
 
 			}
-			if(gWorld->getIterations()!=0 && gWorld->getIterations() % (param.getSteptonextexperiment() * lap) ==0){
+			if(gWorld->getIterations()!=0 && gWorld->getIterations() % (param.getSteptonextexperiment() * lap) ==0 && turn < param.getNbRun()){
 
 				std::cout << name << endl;
 
@@ -1218,34 +1218,216 @@ void VanillaEEWorldObserver::FightBetweenTheStrongAndTheSurvivor(){
 
 
 
+//
+//// like  FightBetweenTheStrongAndTheSurvivor but with 10 best and ten survivor and then make combinatory fight
+//void VanillaEEWorldObserver::FightBetweenTheStrongAndTheSurvivorCombinatoire(int nbCouple){
+//	int lap (param.getSteptonextgeneration());
+//	if ( nbBataille < nbCouple ){
+//
+//
+//		if (    lap!=0 && gWorld->getIterations() % lap == 0 )
+//		{
+//
+//
+//			if(lap!=0 && gWorld->getIterations() == lap ){
+//
+//				cout << "ON NE CA QU'UNE FOIS"<<endl;
+//
+//				for ( int i = 0 ; i != gWorld->getNbOfRobots() ; i++ )
+//				{
+//					VanillaEEController *controller = ((VanillaEEController*)(gWorld->getRobot(i)->getController()));
+//
+//					if (bestFitness < controller->getPoolSize()){
+//
+//						bestFitness = controller->getPoolSize();
+//						BestGenomeArray[nbBataille] = controller->getGenome();
+//					}
+//
+//
+//				}
+//			}
+//
+//
+//
+//			if (gWorld->getIterations()!=0 && gWorld->getIterations() % (param.getSteptonextexperiment() * lap ) ==0){
+//				SurvivorGenomeArray[nbBataille] = ((VanillaEEController*)(gWorld->getRobot(0)->getController()))->getGenome();
+//				nbBataille ++;
+//
+//
+//				bestFitness =0;
+//				_world->resetWorld();
+//
+//
+//				cout << "laaaa on change"<<endl;
+//
+//				if (nbBataille ==nbCouple){
+//					for ( int i = 0 ; i < gWorld->getNbOfRobots()/2 ; i++ )
+//					{
+//						((VanillaEEController*)(gWorld->getRobot(i)->getController()))->setGenome(BestGenomeArray[0 ]);
+//						((VanillaEEController*)(gWorld->getRobot(gWorld->getNbOfRobots()/2 + i)->getController()))->setGenome(SurvivorGenomeArray[0 ]);
+//
+//					}
+//					cout << "laaaaaaaaaaaaa turn 10"<<endl;
+//				}
+//
+//			}
+//
+//		}
+//
+//	}
+//
+//	else {
+//
+//
+//		name = "logs_" + param.toString()+".csv";
+//
+//
+//
+//		if (     gWorld->getIterations() % lap == 0 )//		if (    /*lap!=0*/ && gWorld->getIterations() % lap == 0 )
+//		{
+//
+//			// ENREGISTER TUE PROPORTION
+//			double proportion(0);
+//			for ( int i = 0 ; i != gWorld->getNbOfRobots() ; i++ )
+//			{
+//				//Robot *robot = (gWorld->getRobot(i));
+//				VanillaEEController *controller = ((VanillaEEController*)(gWorld->getRobot(i)->getController()));
+//
+//
+//
+//
+//				if(SurvivorGenomeArray[(int) (indexBatailleS) ].sameAncestor(controller->getGenome())){
+//					proportion +=1;
+//				}
+//
+//			}
+//
+//
+//			ofstream fichier9("VanillaEE/proportion_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//			fichier9 << proportion / gWorld->getNbOfRobots() <<",";
+//			fichier9.close();  // on referme le fichier
+//
+//
+//
+//
+//
+//
+//		}
+//
+//		saveAllExperience();
+//
+//		if( gWorld->getIterations() % (param.getSteptonextexperiment() * lap ) ==0){
+//
+//			ofstream fichier9("VanillaEE/proportion_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//			fichier9  <<endl;
+//			fichier9.close();  // on referme le fichier
+//
+//			for ( int i = 0 ; i < gWorld->getNbOfRobots()/2 ; i++ )
+//			{
+//				((VanillaEEController*)(gWorld->getRobot(i)->getController()))->setGenome(BestGenomeArray[(int) (indexBatailleB) ]);
+//				((VanillaEEController*)(gWorld->getRobot(gWorld->getNbOfRobots()/2 + i)->getController()))->setGenome(SurvivorGenomeArray[(int) (indexBatailleS) ]);
+//
+//			}
+//
+//			if (turn == param.getNbRun() && (indexBatailleS < nbCouple) ){
+//				turn =0;
+//
+//
+//
+//
+//
+//
+//				ofstream fichier1("VanillaEE/fitness_" +name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//				ofstream fichier2("VanillaEE/poolSize_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//				ofstream fichier3("VanillaEE/genomeAge_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//				ofstream fichier4("VanillaEE/distance_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//				ofstream fichier5("VanillaEE/inactive_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//				ofstream fichier6("VanillaEE/nbgenome_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//				ofstream fichier7("VanillaEE/fitnessmax_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//				ofstream fichier8("VanillaEE/poolSizemax_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//				ofstream fichier9("VanillaEE/proportion_"+name, ios::out |  ios::app);  //déclaration du flux et ouverture du fichier
+//
+//
+//
+//
+//				if(fichier1 && fichier2 && fichier3 &&fichier4 && fichier5 && fichier6 && fichier7)  // si l'ouverture a réussi
+//
+//				{
+//
+//
+//
+//					fichier1  <<endl;
+//					fichier2  <<endl;
+//					fichier3  <<endl;
+//					fichier4  <<endl;
+//					fichier5  <<endl;
+//					fichier6  <<endl;
+//					fichier7  <<endl;
+//					fichier8  <<endl;
+//					fichier9  <<endl;
+//
+//					fichier1.close();  // on referme le fichier
+//					fichier2.close();  // on referme le fichier
+//					fichier4.close();  // on referme le fichier
+//					fichier5.close();  // on referme le fichier
+//					fichier6.close();  // on referme le fichier
+//					fichier7.close();  // on referme le fichier
+//					fichier8.close();  // on referme le fichier
+//					fichier9.close();  // on referme le fichier
+//
+//				}
+//
+//				else{  // sinon
+//
+//					cerr << "Erreur à l'ouverture !" << endl;
+//
+//				}
+//
+//
+//
+//				calculIndexBataille(nbCouple);
+//
+//
+//				for ( int i = 0 ; i < gWorld->getNbOfRobots()/2 ; i++ )
+//				{
+//					((VanillaEEController*)(gWorld->getRobot(i)->getController()))->setGenome(BestGenomeArray[(int) (indexBatailleB) ]);
+//					((VanillaEEController*)(gWorld->getRobot(gWorld->getNbOfRobots()/2 + i)->getController()))->setGenome(SurvivorGenomeArray[(int) (indexBatailleS) ]);
+//
+//				}
+//			}
+//		}
+//	}
+//
+//}
+
 
 // like  FightBetweenTheStrongAndTheSurvivor but with 10 best and ten survivor and then make combinatory fight
 void VanillaEEWorldObserver::FightBetweenTheStrongAndTheSurvivorCombinatoire(int nbCouple){
 	int lap (param.getSteptonextgeneration());
-	if ( nbBataille < nbCouple ){
+		if ( nbBataille < nbCouple ){
 
 
-		if (    lap!=0 && gWorld->getIterations() % lap == 0 )
-		{
+			if (    lap!=0 && gWorld->getIterations() % lap == 0 )
+			{
 
 
-			if(lap!=0 && gWorld->getIterations() == lap ){
+				if(lap!=0 && gWorld->getIterations() == lap ){
 
-				cout << "ON NE CA QU'UNE FOIS"<<endl;
+					cout << "ON NE CA QU'UNE FOIS"<<endl;
 
-				for ( int i = 0 ; i != gWorld->getNbOfRobots() ; i++ )
-				{
-					VanillaEEController *controller = ((VanillaEEController*)(gWorld->getRobot(i)->getController()));
+					for ( int i = 0 ; i != gWorld->getNbOfRobots() ; i++ )
+					{
+						VanillaEEController *controller = ((VanillaEEController*)(gWorld->getRobot(i)->getController()));
 
-					if (bestFitness < controller->getPoolSize()){
+						if (bestFitness < controller->getPoolSize()){
 
-						bestFitness = controller->getPoolSize();
-						BestGenomeArray[nbBataille] = controller->getGenome();
+							bestFitness = controller->getPoolSize();
+							BestGenomeArray[nbBataille] = controller->getGenome();
+						}
+
+
 					}
-
-
 				}
-			}
 
 
 
@@ -1283,7 +1465,7 @@ void VanillaEEWorldObserver::FightBetweenTheStrongAndTheSurvivorCombinatoire(int
 
 
 
-		if (     gWorld->getIterations() % lap == 0 )//		if (    /*lap!=0*/ && gWorld->getIterations() % lap == 0 )
+		if (     gWorld->getIterations() % lap == 0  and turn < param.getNbRun())//		if (    /*lap!=0*/ && gWorld->getIterations() % lap == 0 )
 		{
 
 			// ENREGISTER TUE PROPORTION
@@ -1307,11 +1489,6 @@ void VanillaEEWorldObserver::FightBetweenTheStrongAndTheSurvivorCombinatoire(int
 			fichier9 << proportion / gWorld->getNbOfRobots() <<",";
 			fichier9.close();  // on referme le fichier
 
-
-
-
-
-
 		}
 
 		saveAllExperience();
@@ -1329,7 +1506,7 @@ void VanillaEEWorldObserver::FightBetweenTheStrongAndTheSurvivorCombinatoire(int
 
 			}
 
-			if (turn == param.getNbRun() && (indexBatailleS < nbCouple) ){
+			if (turn == param.getNbRun() && ((indexBatailleS < nbCouple ) && (indexBatailleB < nbCouple ))){
 				turn =0;
 
 
@@ -1399,8 +1576,6 @@ void VanillaEEWorldObserver::FightBetweenTheStrongAndTheSurvivorCombinatoire(int
 	}
 
 }
-
-
 
 
 // like  FightBetweenTheStrongAndTheSurvivor but with 10 best and ten survivor and then make combinatory fight

@@ -23,7 +23,7 @@
 #define MINMUTATIONALPHA 5
 #define MINMUTATIONEPSILON 0.2
 #define MINMUTATIONSIGMA 0.0001
-#define MINTOURNAMENTSIZE 10
+#define MINTOURNAMENTSIZE 1
 #define MINDEATHLENGTH 1  // do not touch this , never																																								never
 #define MINCHOICETOURNOI 1 // IF 1 IT IS A SIMPLE TOURNOI , 2 IT IS FITNESS PROPORTIONNAL TOURNOI
 
@@ -63,10 +63,10 @@
 
 
 #define GAUSIENNE true
-#define STEPTONEXTEXPERIMENT 20
+#define STEPTONEXTEXPERIMENT 100
 #define REACTIVATIONVALUE  1  // if 1, reactivate only if other genome from other agent, 2 reactivate with new genome , 3 never reactivate
 #define FITNESSTYPE 2 // if 2 the fitness is the distance traveled , if 1 fitness is the number of reward
-#define NBRUN  2
+#define NBRUN  10
 
 
 
